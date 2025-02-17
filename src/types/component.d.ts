@@ -6,6 +6,7 @@
 import 'vue'
 import  XtxSwiper from '@/components/XtxSwiper.vue'
 import  XtxGuess from '@/components/XtxGuess.vue'
+import { InstanceType } from '@dcloudio/uni-app'
 
 declare module 'vue' {
   export interface GlobalComponents {
@@ -14,4 +15,5 @@ declare module 'vue' {
   }
 }
 
-
+// 组件实例类型
+export type XtxGuessInstance = InstanceType<typeof XtxGuess>

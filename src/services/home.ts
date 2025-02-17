@@ -1,6 +1,6 @@
 import { http } from "@/utils/http"
 import type { BannerItem, CategoryItem, HotItem, GuessItem } from "@/types/home"
-import type { PageResult } from "@/types/global"
+import type { PageResult,PageParams } from "@/types/global"
 
 // 首页-广告区域-小程序
 // @param distributionSite 广告区域展示位置（投放位置，1为首页，2为分类商品页，默认为1）
@@ -31,9 +31,10 @@ export const getHomeHotAPI = () => {
 }
 
 // 猜你喜欢-小程序
-export const getHomeGoodsGuessLikeAPI = () => {
+export const getHomeGoodsGuessLikeAPI = (data?:PageParams) => {
   return http<PageResult<GuessItem>>({
     method: "GET",
     url: "/home/goods/guessLike",
+    data:data,
   })
 }

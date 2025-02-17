@@ -2,15 +2,48 @@
 import { getHomeGoodsGuessLikeAPI } from '@/services/home'
 import { onMounted, ref } from 'vue'
 import type { GuessItem } from '@/types/home'
-// 获取猜你喜欢数据
-const guessList = ref<GuessItem[]>([])
-const getHomeGoodsGuessLikeData = async () => {
-  const res = await getHomeGoodsGuessLikeAPI()
-  guessList.value = res.result.items
+import type { PageResult, PageParams } from '@/types/global'
+
+// 分页参数
+const pageParams: PageParams = {
+  page: 1,
+  pageSize: 10,
 }
-// 组件挂载完毕时请求数据
+// 猜你喜欢列表
+const guessList = ref<GuessItem[]>([])
+// 已结束标记
+const finish = ref(false)
+// 获取猜你喜欢数据
+const getHomeGoodsGuessLikeData = async () => {
+  // 退出判断
+  if (finish.value === true) {
+    return uni.showToast({
+      icon: 'none',
+      title: '没有更多数据',
+    })
+  }
+  const res = await getHomeGoodsGuessLikeAPI(pageParams)
+  // guessList.value = res.result.items
+  // 数组追加(使用展开运算符将新数组展开合并到原数组)
+  guessList.value.push(...res.result.items)
+  // 分页条件
+  if (pageParams.page! < res.result.pages) {
+    // 页码累加
+    pageParams.page!++
+  } else {
+    finish.value = true
+  }
+}
+
+// 组件挂载完毕
 onMounted(() => {
   getHomeGoodsGuessLikeData()
+})
+
+// 暴露方法
+defineExpose({
+  // 重命名方法
+  getMore: getHomeGoodsGuessLikeData,
 })
 </script>
 
@@ -34,7 +67,7 @@ onMounted(() => {
       </view>
     </navigator>
   </view>
-  <view class="loading-text"> 正在加载... </view>
+  <view class="loading-text"> {{ finish ? '没有更多数据' : '正在加载...' }} </view>
 </template>
 
 <style lang="scss">
