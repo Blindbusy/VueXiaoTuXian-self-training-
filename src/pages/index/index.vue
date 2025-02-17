@@ -7,6 +7,7 @@ import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home'
 import type { XtxGuessInstance } from '@/types/component'
+import { log } from 'console'
 
 // 获取轮播图数据
 const bannerList = ref<BannerItem[]>([])
@@ -46,13 +47,34 @@ const onScrolltolower = () => {
   // console.log('滚动触底')
   guessRef.value?.getMore()
 }
+
+const isTriggered = ref(false)
+// 下拉刷新
+const onRefresherrefresh = async () => {
+  // 加载动画
+  isTriggered.value = true
+  // 更新轮播图、前台分类和热门推荐数据
+  // await getHomeBannerData()
+  // await getHomeCategoryData()
+  // await getHomeHotData()
+  Promise.all([getHomeBannerData(), getHomeCategoryData(), getHomeHotData()])
+  // 关闭动画
+  isTriggered.value = false
+}
 </script>
 
 <template>
   <!-- 自定义导航栏 -->
   <CustomNavbar />
   <!-- 滚动容器 -->
-  <scroll-view @scrolltolower="onScrolltolower" class="scroll-view" scroll-y="true">
+  <scroll-view
+    refresher-enabled="true"
+    @refresherrefresh="onRefresherrefresh"
+    @scrolltolower="onScrolltolower"
+    :refresher-triggered="isTriggered"
+    class="scroll-view"
+    scroll-y="true"
+  >
     <!-- 自定义轮播图 -->
     <XtxSwiper :list="bannerList" />
     <!-- 分类面板 -->
