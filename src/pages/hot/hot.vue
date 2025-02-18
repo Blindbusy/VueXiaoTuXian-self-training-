@@ -1,4 +1,11 @@
+<!-- 注意：
+此组件是复用组件，动态获取数据，
+是“热门推荐”组件中四个主题推荐板块
+实现页面跳转的目标页面。 -->
 <script setup lang="ts">
+import { getHotRecommendAPI } from '@/services/hot'
+import { onLoad } from '@dcloudio/uni-app'
+
 // 热门推荐页 标题和url
 const urlMap = [
   { type: '1', title: '特惠推荐', url: '/hot/preference' },
@@ -16,6 +23,18 @@ const currUrlMap = urlMap.find((v) => v.type === query.type)
 // 动态设置标题
 uni.setNavigationBarTitle({
   title: currUrlMap!.title,
+})
+
+// 保存获取到的对应板块的“热门推荐”数据
+// 获取热门推荐数据
+const getHotRecommendData = async () => {
+  const res = await getHotRecommendAPI(currUrlMap!.url)
+  console.log(res.result)
+}
+
+// 在页面加载时调用函数
+onLoad(() => {
+  getHotRecommendData()
 })
 </script>
 
