@@ -1,4 +1,5 @@
 import {http} from "@/utils/http"
+import type {LoginResult} from "@/types/member"
 
 type LoginParams={
   code:string,
@@ -8,7 +9,7 @@ type LoginParams={
 
 // 小程序登陆
 export const postLoginWxMinAPI=(data:LoginParams)=>{
-  return http({
+  return http<LoginResult>({
     method:"POST",
     url:"/login/wxMin",
     data
