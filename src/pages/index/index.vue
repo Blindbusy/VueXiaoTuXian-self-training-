@@ -9,6 +9,7 @@ import { ref } from 'vue'
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home'
 import type { XtxGuessInstance } from '@/types/component'
 import { log } from 'console'
+import { useGuessList } from '@/composables/index'
 
 // 获取轮播图数据
 const bannerList = ref<BannerItem[]>([])
@@ -42,14 +43,8 @@ onLoad(async () => {
   isLoading.value = false
 })
 
-// 获取猜你喜欢组件实例
-const guessRef = ref<XtxGuessInstance>()
-
-// 滚动触底
-const onScrolltolower = () => {
-  // console.log('滚动触底')
-  guessRef.value?.getMore()
-}
+// 获取猜你喜欢组件实例和滑动触底
+const { guessRef, onScrolltolower } = useGuessList()
 
 const isTriggered = ref(false)
 // 下拉刷新
