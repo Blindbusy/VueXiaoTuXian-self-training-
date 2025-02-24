@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getMemberProfileAPI } from '@/services/profile'
+import { getMemberProfileAPI, putMemberProfileAPI } from '@/services/profile'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import type { ProfileDetail } from '@/types/member'
@@ -7,9 +7,10 @@ import type { ProfileDetail } from '@/types/member'
 const { safeAreaInsets } = uni.getSystemInfoSync()
 
 // 获取个人信息
-const profile = ref<ProfileDetail>()
+const profile = ref<ProfileDetail>({} as ProfileDetail)
 const getMemberProfileData = async () => {
   const res = await getMemberProfileAPI()
+  profile.value = res.result
 }
 
 onLoad(() => {
@@ -48,6 +49,17 @@ const onAvatarChange = () => {
     },
   })
 }
+
+// 点击保存提交表单
+const onSubmit = async () => {
+  const res = await putMemberProfileAPI({
+    nickname: profile.value?.nickname,
+  })
+  uni.showToast({
+    icon: 'success',
+    title: '保存成功',
+  })
+}
 </script>
 
 <template>
@@ -74,7 +86,7 @@ const onAvatarChange = () => {
         </view>
         <view class="form-item">
           <text class="label">昵称</text>
-          <input class="input" type="text" placeholder="请填写昵称" :value="profile?.nickname" />
+          <input class="input" type="text" placeholder="请填写昵称" v-model="profile!.nickname" />
         </view>
         <view class="form-item">
           <text class="label">性别</text>
@@ -104,7 +116,7 @@ const onAvatarChange = () => {
         </view>
         <view class="form-item">
           <text class="label">城市</text>
-          <picker class="picker" mode="region" :value="profile?.fullLocation.split(' ')">
+          <picker class="picker" mode="region" :value="profile!.fullLocation.split(' ')">
             <view v-if="profile?.fullLocation">{{ profile?.fullLocation }}</view>
             <view class="placeholder" v-else>请选择城市</view>
           </picker>
@@ -115,7 +127,7 @@ const onAvatarChange = () => {
         </view>
       </view>
       <!-- 提交按钮 -->
-      <button class="form-button">保 存</button>
+      <button class="form-button" @tap="onSubmit">保 存</button>
     </view>
   </view>
 </template>
