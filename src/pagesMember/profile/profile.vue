@@ -66,6 +66,7 @@ const onBirthdayChange: UniHelper.DatePickerOnChange = (ev) => {
 // 修改城市
 let fullLocationcode: [string, string, string] = ['', '', '']
 const onFullLocationChange: UniHelper.RegionPickerOnChange = (ev) => {
+  // 用于前端界面更新
   profile.value.fullLocation = ev.detail.value.join(' ')
   // 用于提交后端更新
   fullLocationcode = ev.detail.code!
@@ -80,6 +81,7 @@ const onSubmit = async () => {
     provinceCode: fullLocationcode[0],
     cityCode: fullLocationcode[1],
     countyCode: fullLocationcode[2],
+    profession: profile.value.profession,
   })
   memberStore.profile!.nickname = res.result.nickname
   uni.showToast({
@@ -159,7 +161,7 @@ const onSubmit = async () => {
         </view>
         <view class="form-item">
           <text class="label">职业</text>
-          <input class="input" type="text" placeholder="请填写职业" :value="profile?.profession" />
+          <input class="input" type="text" placeholder="请填写职业" v-model="profile.profession" />
         </view>
       </view>
       <!-- 提交按钮 -->
