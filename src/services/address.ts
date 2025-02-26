@@ -1,5 +1,6 @@
 import {http} from "@/utils/http"
 import type {AddressParams} from "@/types/address.d.ts"
+import type { AddressItem } from '@/types/address.d'
 
 // 添加收获地址
 export const postMemberAddressAPI = (data:AddressParams)=>{
@@ -7,5 +8,13 @@ export const postMemberAddressAPI = (data:AddressParams)=>{
     method:'POST',
     url:'/member/address',
     data
+  })
+}
+
+// 获取收货地址列表
+export const getMemberAddressAPI=()=>{
+  return http<AddressItem[]>({
+    method:'GET',
+    url:"/member/address"
   })
 }
