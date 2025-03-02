@@ -4,9 +4,17 @@ import XtxGuess from '@/components/XtxGuess.vue'
 // 获取登陆状态
 import { useMemberStore } from '@/stores'
 import { onLoad, onShow } from '@dcloudio/uni-app'
-import { deleteMemberCartAPI, getMemberCartAPI } from '@/services/cart'
+import {
+  deleteMemberCartAPI,
+  getMemberCartAPI,
+  putMemberCartBySkuIdAPI,
+} from '@/services/cart'
 import { ref } from 'vue'
 import type { CartItem } from '@/types/cart'
+import type {
+  InputNumberBox,
+  InputNumberBoxEvent,
+} from '@/components/vk-data-input-number-box'
 const memberStore = useMemberStore()
 // 获取猜你喜欢组件实例和滑动触底
 const { guessRef, onScrolltolower } = useGuessList()
@@ -38,6 +46,11 @@ const onDeleteCart = (skuId: string) => {
       }
     },
   })
+}
+
+// 修改商品数量
+const onChangeCount = (ev: InputNumberBoxEvent) => {
+  putMemberCartBySkuIdAPI(ev.index, { count: ev.value })
 }
 </script>
 <template>
@@ -81,13 +94,13 @@ const onDeleteCart = (skuId: string) => {
               </navigator>
               <!-- 商品数量 -->
               <view class="count">
-                <text class="text">-</text>
-                <input
-                  class="input"
-                  type="number"
-                  :value="item.count.toString()"
+                <vk-data-input-number-box
+                  v-model="item.count"
+                  :min="1"
+                  :max="item.stock"
+                  @change="onChangeCount"
+                  :index="item.skuId"
                 />
-                <text class="text">+</text>
               </view>
             </view>
             <!-- 右侧删除按钮 -->
