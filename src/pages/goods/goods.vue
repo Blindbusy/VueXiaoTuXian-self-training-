@@ -6,9 +6,11 @@ import { onLoad } from '@dcloudio/uni-app'
 import AddressPanel from '@/pages/goods/components/AddressPanel.vue'
 import ServicePanel from '@/pages/goods/components/ServicePanel.vue'
 import type {
+  SkuPopupEvent,
   SkuPopupInstance,
   SkuPopupLocaldata,
 } from '@/components/vk-data-goods-sku-popup'
+import { postMemberCartAPI } from '@/services/cart'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -103,8 +105,17 @@ const openSkuPopup = (val: SkuMode) => {
 const skuPopRef = ref<SkuPopupInstance>()
 // 计算被选中的值
 const selectArrText = computed(() => {
-  return skuPopRef.value?.selectArr.join(' ')
+  return skuPopRef.value?.selectArr.join(' ').trim() || '请选择商品信息'
 })
+// 加入购物车事件
+const onAddCart = async (ev: SkuPopupEvent) => {
+  const res = await postMemberCartAPI({ skuId: ev._id, count: ev.buy_num })
+  uni.showToast({
+    title: '添加成功',
+    icon: 'success',
+  })
+  isShowSku.value = false
+}
 </script>
 
 <template>
@@ -117,11 +128,12 @@ const selectArrText = computed(() => {
     ,
     buy-now-background-color="#27BA9B"
     ref="skuPopRef"
-    :active-style="{
+    :actived-style="{
       color: '#27BA9B',
       borderColor: '#27BA9B',
       backgroundColor: '#E9F8F5',
     }"
+    @add-cart="onAddCart"
   />
 
   <scroll-view scroll-y class="viewport">
@@ -156,7 +168,7 @@ const selectArrText = computed(() => {
         <view class="item arrow" @tap="openSkuPopup(SkuMode.Both)">
           <text class="label">选择</text>
           <text class="text ellipsis">
-            {{ selectArrText === ' ' ? '请选择商品规格' : selectArrText }}
+            {{ selectArrText }}
           </text>
         </view>
         <view class="item arrow" @tap="openPopup('address')">
