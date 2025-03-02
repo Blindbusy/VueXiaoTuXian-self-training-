@@ -8,21 +8,25 @@ import {
   deleteMemberCartAPI,
   getMemberCartAPI,
   putMemberCartBySkuIdAPI,
+  putMemberCartSelectedAPI,
 } from '@/services/cart'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import type { CartItem } from '@/types/cart'
 import type {
   InputNumberBox,
   InputNumberBoxEvent,
 } from '@/components/vk-data-input-number-box'
+// 获取登陆状态
 const memberStore = useMemberStore()
 // 获取猜你喜欢组件实例和滑动触底
 const { guessRef, onScrolltolower } = useGuessList()
-// 滑动触底加载更获取购物车列表
+
+// 获取购物车列表
 const CartList = ref<CartItem[]>([])
 const getMemberCartData = async () => {
   const res = await getMemberCartAPI()
   CartList.value = res.result
+  // console.log(CartList.value)
 }
 // 页面初始化
 onShow(() => {
@@ -52,6 +56,30 @@ const onDeleteCart = (skuId: string) => {
 const onChangeCount = (ev: InputNumberBoxEvent) => {
   putMemberCartBySkuIdAPI(ev.index, { count: ev.value })
 }
+
+// 修改选中状态
+const onChangeSelected = (item: CartItem) => {
+  item.selected = !item.selected
+  putMemberCartBySkuIdAPI(item.skuId, { selected: item.selected })
+}
+
+// 计算全选状态
+const isSelectedAll = computed(() => {
+  return (
+    CartList.value.length &&
+    CartList.value.every((item) => item.selected === true)
+  )
+})
+// 全选修改
+const onChangeSelectedAll = async () => {
+  const _isSelectedAll = !isSelectedAll.value
+  // 前端数据更新
+  CartList.value.forEach((item) => {
+    item.selected = _isSelectedAll
+  })
+  // 后端数据更新
+  await putMemberCartSelectedAPI({ selected: _isSelectedAll })
+}
 </script>
 <template>
   <scroll-view scroll-y class="scroll-view" @scrolltolower="onScrolltolower">
@@ -75,7 +103,11 @@ const onChangeCount = (ev: InputNumberBoxEvent) => {
             <!-- 商品信息 -->
             <view class="goods">
               <!-- 选中状态 -->
-              <text class="checkbox" :class="{ checked: item.selected }"></text>
+              <text
+                class="checkbox"
+                :class="{ checked: item.selected }"
+                @tap="onChangeSelected(item)"
+              ></text>
               <navigator
                 :url="`/pages/goods/goods?id=${item.id}`"
                 hover-class="none"
@@ -131,7 +163,13 @@ const onChangeCount = (ev: InputNumberBoxEvent) => {
       </view>
       <!-- 吸底工具栏 -->
       <view class="toolbar">
-        <text class="all" :class="{ checked: true }">全选</text>
+        <text
+          class="all"
+          :class="{ checked: isSelectedAll }"
+          @tap="onChangeSelectedAll"
+        >
+          全选</text
+        >
         <text class="text">合计:</text>
         <text class="amount">100</text>
         <view class="button-grounp">
