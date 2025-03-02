@@ -38,12 +38,13 @@ const loginSuccess = (profile: LoginResult) => {
     icon: 'none',
     title: '登陆成功',
   })
-  setTimeout(() => {
-    // 页面跳转
-    uni.switchTab({
-      url: '/pages/my/my',
-    })
-  }, 500)
+  // setTimeout(() => {
+  //   // 页面跳转
+  //   uni.switchTab({
+  //     url: '/pages/my/my',
+  //   })
+  // }, 500)
+  uni.navigateBack()
 }
 </script>
 
@@ -61,7 +62,11 @@ const loginSuccess = (profile: LoginResult) => {
       <!-- <button class="button phone">登录</button> -->
 
       <!-- 小程序端授权登录 -->
-      <button class="button phone" open-type="getPhoneNumber" @getphonenumber="onGetphonenumber">
+      <button
+        class="button phone"
+        open-type="getPhoneNumber"
+        @getphonenumber="onGetphonenumber"
+      >
         <text class="icon icon-phone"></text>
         手机号快捷登录
       </button>
@@ -76,7 +81,9 @@ const loginSuccess = (profile: LoginResult) => {
           </button>
         </view>
       </view>
-      <view class="tips">登录/注册即视为你同意《服务条款》和《小兔鲜儿隐私协议》</view>
+      <view class="tips"
+        >登录/注册即视为你同意《服务条款》和《小兔鲜儿隐私协议》</view
+      >
     </view>
   </view>
 </template>

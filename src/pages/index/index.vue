@@ -3,12 +3,15 @@ import CustomNavbar from './components/CustomNavbar.vue'
 import CategoryPanel from '@/pages/index/components/CategoryPanel.vue'
 import HotPannel from '@/pages/index/components/HotPannel.vue'
 import PageSkeleton from '@/pages/index/components/PageSkeleton.vue'
-import { getHomeBannerAPI, getHomeCategoryAPI, getHomeHotAPI } from '@/services/home'
+import {
+  getHomeBannerAPI,
+  getHomeCategoryAPI,
+  getHomeHotAPI,
+} from '@/services/home'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home'
 import type { XtxGuessInstance } from '@/types/component'
-import { log } from 'console'
 import { useGuessList } from '@/composables/index'
 
 // 获取轮播图数据
@@ -39,7 +42,11 @@ const isLoading = ref(false)
 // 加载页面时调用
 onLoad(async () => {
   isLoading.value = true
-  await Promise.all([getHomeBannerData(), getHomeCategoryData(), getHomeHotData()])
+  await Promise.all([
+    getHomeBannerData(),
+    getHomeCategoryData(),
+    getHomeHotData(),
+  ])
   isLoading.value = false
 })
 
