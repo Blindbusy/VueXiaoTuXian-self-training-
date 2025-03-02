@@ -80,6 +80,32 @@ const onChangeSelectedAll = async () => {
   // 后端数据更新
   await putMemberCartSelectedAPI({ selected: _isSelectedAll })
 }
+// 计算选中单品列表
+const selectedCartList = computed(() => {
+  return CartList.value.filter((item) => item.selected === true)
+})
+// 计算选中商品总数量
+const selectedCount = computed(() => {
+  return selectedCartList.value.reduce((sum, item) => sum + item.count, 0)
+})
+// 计算选中商品总价格
+const selectedAmount = computed(() => {
+  return selectedCartList.value
+    .reduce((sum, item) => sum + item.nowPrice * item.count, 0)
+    .toFixed(2)
+})
+// 跳转到支付页面
+const gotoPayment = () => {
+  if (selectedCount.value === 0) {
+    return uni.showToast({
+      title: '请选择商品',
+      icon: 'none',
+    })
+  }
+  uni.showToast({
+    title: '等待完成',
+  })
+}
 </script>
 <template>
   <scroll-view scroll-y class="scroll-view" @scrolltolower="onScrolltolower">
@@ -171,10 +197,14 @@ const onChangeSelectedAll = async () => {
           全选</text
         >
         <text class="text">合计:</text>
-        <text class="amount">100</text>
+        <text class="amount">{{ selectedAmount }}</text>
         <view class="button-grounp">
-          <view class="button payment-button" :class="{ disabled: true }">
-            去结算(10)
+          <view
+            class="button payment-button"
+            :class="{ disabled: selectedCount === 0 }"
+            @tap="gotoPayment"
+          >
+            去结算({{ selectedCount }}件)
           </view>
         </view>
       </view>
