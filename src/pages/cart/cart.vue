@@ -4,7 +4,7 @@ import XtxGuess from '@/components/XtxGuess.vue'
 // 获取登陆状态
 import { useMemberStore } from '@/stores'
 import { onLoad, onShow } from '@dcloudio/uni-app'
-import { getMemberCartAPI } from '@/services/cart'
+import { deleteMemberCartAPI, getMemberCartAPI } from '@/services/cart'
 import { ref } from 'vue'
 import type { CartItem } from '@/types/cart'
 const memberStore = useMemberStore()
@@ -23,6 +23,22 @@ onShow(() => {
     getMemberCartData()
   }
 })
+
+// 点击删除购物车
+const onDeleteCart = (skuId: string) => {
+  // 弹出提示框
+  uni.showModal({
+    content: '是否删除该商品',
+    success: async (res) => {
+      if (res.confirm) {
+        // 调用删除接口
+        await deleteMemberCartAPI({ ids: [skuId] })
+        // 删除成功后重新获取购物车列表
+        getMemberCartData()
+      }
+    },
+  })
+}
 </script>
 <template>
   <scroll-view scroll-y class="scroll-view" @scrolltolower="onScrolltolower">
@@ -77,7 +93,12 @@ onShow(() => {
             <!-- 右侧删除按钮 -->
             <template #right>
               <view class="cart-swipe-right">
-                <button class="button delete-button">删除</button>
+                <button
+                  class="button delete-button"
+                  @tap="onDeleteCart(item.skuId)"
+                >
+                  删除
+                </button>
               </view>
             </template>
           </uni-swipe-action-item>
