@@ -34,6 +34,12 @@
       }
     },
     {
+      "path": "pages/cart/cart2",
+      "style": {
+        "navigationBarTitleText": "购物车"
+      }
+    },
+    {
       "path": "pages/category/category",
       "style": {
         "navigationBarTitleText": "分类"
@@ -99,45 +105,45 @@
   },
   // 分包加载规则
   "subPackages": [
-      {
-        // 子包的根目录
-        "root": "pagesMember",
-        // 页面路径和窗口表现
-        "pages": [
-          {
-            "path": "settings/settings",
-            "style": {
-              "navigationBarTitleText": "设置"
-            }
-          },
-          {
-            "path": "profile/profile",
-            "style": {
-              "navigationStyle": "custom",
-              "navigationBarTitleText": "个人信息",
-              "navigationBarTextStyle": "white"
-            }
-          },
-          {
-            "path": "address/address",
-            "style":{
-              "navigationBarTitleText":"地址管理"
-            }
-          },
-          {
-            "path": "address-form/address-form",
-            "style":{
-              "navigationBarTitleText":""
-            }
+    {
+      // 子包的根目录
+      "root": "pagesMember",
+      // 页面路径和窗口表现
+      "pages": [
+        {
+          "path": "settings/settings",
+          "style": {
+            "navigationBarTitleText": "设置"
           }
-        ]
-      }
-    ],
-    // 分包预下载规则
-    "preloadRule": {
-      "pages/my/my": {
-        "network": "all",
-        "packages": ["pagesMember"]
-      }
+        },
+        {
+          "path": "profile/profile",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "个人信息",
+            "navigationBarTextStyle": "white"
+          }
+        },
+        {
+          "path": "address/address",
+          "style": {
+            "navigationBarTitleText": "地址管理"
+          }
+        },
+        {
+          "path": "address-form/address-form",
+          "style": {
+            "navigationBarTitleText": ""
+          }
+        }
+      ]
     }
+  ],
+  // 分包预下载规则
+  "preloadRule": {
+    "pages/my/my": {
+      "network": "all",
+      "packages": ["pagesMember"]
+    }
+  }
 }
