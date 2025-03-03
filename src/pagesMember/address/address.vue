@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { onLoad, onShow } from '@dcloudio/uni-app'
-import { getMemberAddressAPI, deleteMemberAddressByIdAPI } from '@/services/address'
+import {
+  getMemberAddressAPI,
+  deleteMemberAddressByIdAPI,
+} from '@/services/address'
 import { ref } from 'vue'
 import type { AddressItem } from '@/types/address.d'
+import { useAddressStore } from '@/stores/modules/address'
 
 // 获取收货地址列表数据
 const addressList = ref<AddressItem[]>([])
@@ -31,6 +35,13 @@ const onDeleteAddress = (id: string) => {
     },
   })
 }
+// 修改地址的函数
+const onChangeAddress = (item: AddressItem) => {
+  const addressStore = useAddressStore()
+  addressStore.changeSelectedAddress(item)
+  // 修改地址后返回上一页
+  uni.navigateBack()
+}
 </script>
 
 <template>
@@ -40,25 +51,34 @@ const onDeleteAddress = (id: string) => {
       <view v-if="addressList.length" class="address">
         <uni-swipe-action class="address-list">
           <!-- 收货地址项 -->
-          <uni-swipe-action-item class="item" v-for="item in addressList" :key="item.id">
-            <view class="item-content">
+          <uni-swipe-action-item
+            class="item"
+            v-for="item in addressList"
+            :key="item.id"
+          >
+            <view class="item-content" @tap="onChangeAddress(item)">
               <view class="user">
                 {{ item.receiver }}
                 <text class="contact">{{ item.contact }}</text>
                 <text v-if="item.isDefault" class="badge">默认</text>
               </view>
-              <view class="locate">{{ item.fullLocation }} {{ item.address }}</view>
+              <view class="locate"
+                >{{ item.fullLocation }} {{ item.address }}</view
+              >
               <navigator
                 class="edit"
                 hover-class="none"
                 :url="`/pagesMember/address-form/address-form?id=${item.id}`"
+                @tap.stop="() => {}"
               >
                 修改
               </navigator>
             </view>
             <!-- 右侧插槽 -->
             <template #right>
-              <button class="delete-button" @tap="onDeleteAddress(item.id)">删除</button>
+              <button class="delete-button" @tap="onDeleteAddress(item.id)">
+                删除
+              </button>
             </template>
           </uni-swipe-action-item>
         </uni-swipe-action>
@@ -67,7 +87,10 @@ const onDeleteAddress = (id: string) => {
     </scroll-view>
     <!-- 添加按钮 -->
     <view class="add-btn">
-      <navigator hover-class="none" url="/pagesMember/address-form/address-form">
+      <navigator
+        hover-class="none"
+        url="/pagesMember/address-form/address-form"
+      >
         新建地址
       </navigator>
     </view>
