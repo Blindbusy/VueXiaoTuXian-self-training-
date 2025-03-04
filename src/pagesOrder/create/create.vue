@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getMemberAddressAPI } from '@/services/address'
 import { getMemberOrderPreAPI, getMemberOrderPreNowAPI } from '@/services/order'
 import { useAddressStore } from '@/stores/modules/address'
 import type { OrderPreResult } from '@/types/order'
@@ -32,10 +33,13 @@ const query = defineProps<{
 const orderPre = ref<OrderPreResult>()
 const getMemberOrderPreData = async () => {
   if (query.count && query.skuId) {
+    const DefaultAddress = (await getMemberAddressAPI()).result.find(
+      (item) => item.isDefault
+    )
     const res = await getMemberOrderPreNowAPI({
       skuId: query.skuId,
       count: query.count,
-      addressId: addressStore.selectedAddress!.id,
+      addressId: DefaultAddress!.id,
     })
     orderPre.value = res.result
   } else {
