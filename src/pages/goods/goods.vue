@@ -141,6 +141,7 @@ const onBuyNow = (ev: SkuPopupEvent) => {
     }"
     @add-cart="onAddCart"
     @buy-now="onBuyNow"
+    :style="{ marginBottom: safeAreaInsets!.bottom+'px' }"
   />
 
   <scroll-view scroll-y class="viewport">
@@ -264,8 +265,16 @@ const onBuyNow = (ev: SkuPopupEvent) => {
 
   <!-- uni-ui 弹出层-->
   <uni-popup ref="popup" type="bottom" background-color="#fff">
-    <AddressPanel v-if="popupName === 'address'" @close="popup?.close()" />
-    <ServicePanel v-if="popupName === 'service'" @close="popup?.close()" />
+    <AddressPanel
+      v-if="popupName === 'address'"
+      @close="popup?.close()"
+      :show="popupName === 'address'"
+    />
+    <ServicePanel
+      v-if="popupName === 'service'"
+      @close="popup?.close()"
+      isShow="popupName === 'address'"
+    />
   </uni-popup>
 </template>
 

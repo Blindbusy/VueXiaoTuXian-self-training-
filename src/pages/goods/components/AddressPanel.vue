@@ -1,9 +1,41 @@
 // AddressPanel.vue
 <script setup lang="ts">
+import { getMemberAddressAPI } from '@/services/address'
+import type { AddressItem } from '@/types/address'
+import { onLoad, onShow } from '@dcloudio/uni-app'
+import { ref } from 'vue'
+
+// 获取父组件传递过来的参数
+const props = defineProps<{
+  show: boolean
+}>()
 // 子组件调用父组件中关闭弹出层的方法
 const emit = defineEmits<{
   (event: 'close'): void
 }>()
+// 引入地址列表
+const addressList = ref<AddressItem[]>([])
+const getAddressListData = async () => {
+  console.log('获取地址列表数据')
+  const res = await getMemberAddressAPI()
+  console.log(res)
+  addressList.value = res.result
+}
+if (props.show) {
+  getAddressListData()
+}
+// 点击地址
+let timer: any = null
+const onTapAddress = (id: string) => {
+  // console.log('点击地址', id)
+  addressList.value.forEach((item) => {
+    item.isDefault = item.id === id ? 1 : 0
+  })
+  if (timer) clearTimeout(timer)
+  timer = setTimeout(() => {
+    emit('close')
+  }, 2000)
+}
 </script>
 
 <template>
@@ -14,20 +46,17 @@ const emit = defineEmits<{
     <view class="title">配送至</view>
     <!-- 内容 -->
     <view class="content">
-      <view class="item">
-        <view class="user">李明 13824686868</view>
-        <view class="address">北京市顺义区后沙峪地区安平北街6号院</view>
-        <text class="icon icon-checked"></text>
-      </view>
-      <view class="item">
-        <view class="user">王东 13824686868</view>
-        <view class="address">北京市顺义区后沙峪地区安平北街6号院</view>
-        <text class="icon icon-ring"></text>
-      </view>
-      <view class="item">
-        <view class="user">张三 13824686868</view>
-        <view class="address">北京市朝阳区孙河安平北街6号院</view>
-        <text class="icon icon-ring"></text>
+      <view class="item" v-for="item in addressList" :key="item.id">
+        <view class="user">{{ item.receiver }} {{ item.contact }}</view>
+        <view class="address">{{ item.fullLocation }}</view>
+        <text
+          class="icon"
+          :class="{
+            'icon-checked': item.isDefault === 1,
+            'icon-ring': item.isDefault === 0,
+          }"
+          @tap="onTapAddress(item.id)"
+        ></text>
       </view>
     </view>
     <view class="footer">
