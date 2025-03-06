@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { getMemberAddressAPI } from '@/services/address'
-import { getMemberOrderPreAPI, getMemberOrderPreNowAPI } from '@/services/order'
+import {
+  getMemberOrderPreAPI,
+  getMemberOrderPreNowAPI,
+  postMemberOrderAPI,
+} from '@/services/order'
 import { useAddressStore } from '@/stores/modules/address'
 import type { OrderPreResult } from '@/types/order'
 import { onLoad } from '@dcloudio/uni-app'
@@ -61,6 +65,37 @@ const selectedAddress = computed(() => {
     orderPre.value?.userAddresses.find((item) => item.isDefault)
   )
 })
+
+// 提交订单
+const onOrderSubmmit = async () => {
+  if (!selectedAddress.value) {
+    return uni.showToast({
+      icon: 'none',
+      title: '请选择收货地址',
+    })
+  }
+  const res = await postMemberOrderAPI({
+    addressId: selectedAddress.value.id,
+    /** 配送时间类型，1为不限，2为工作日，3为双休或假日 */
+    deliveryTimeType: activeDelivery.value.type,
+    /** 订单备注 */
+    buyerMessage: buyerMessage.value,
+    /** 商品集合[ 商品信息 ] */
+    goods: orderPre.value!.goods.map((item) => {
+      return {
+        count: item.count,
+        skuId: item.skuId,
+      }
+    }),
+    /** 支付渠道：支付渠道，1支付宝、2微信--支付方式为在线支付时，传值，为货到付款时，不传值 */
+    payChannel: 2,
+    /** 支付方式，1为在线支付，2为货到付款 */
+    payType: 1,
+  })
+  uni.redirectTo({
+    url: `/pagesOrder/detail/detail?id=${res.result.id}`,
+  })
+}
 </script>
 
 <template>
@@ -162,7 +197,13 @@ const selectedAddress = computed(() => {
         orderPre?.summary.totalPayPrice.toFixed(2)
       }}</text>
     </view>
-    <view class="button" :class="{ disabled: true }"> 提交订单 </view>
+    <view
+      class="button"
+      :class="{ disabled: !orderPre?.goods }"
+      @tap="onOrderSubmmit"
+    >
+      提交订单
+    </view>
   </view>
 </template>
 
