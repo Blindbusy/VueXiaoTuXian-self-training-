@@ -37,7 +37,7 @@ const getHomeGoodsGuessLikeData = async () => {
 
 // 重置数据
 const resetData = () => {
-  pageParams.page = 10
+  pageParams.page = 1
   guessList.value = []
   finish.value = false
 }
