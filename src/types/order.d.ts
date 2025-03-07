@@ -1,4 +1,5 @@
 import type { AddressItem } from './address'
+import type { OrderState } from '@/services/constans'
 
 /** 获取预付订单 返回信息 */
 export type OrderPreResult = {
@@ -66,4 +67,18 @@ export type OrderCreateParams = {
 export type OrderCreateResult = {
   /** 订单Id */
   id: string
+}
+
+export type OrderResult = {
+  id: string
+  orderState: OrderState
+  countdown: number
+  skus: OrderSkuItem[]
+  receiverContact: string
+  receiverMobile: string
+  receiverAddress: string
+  createTime: string
+  totalMoney: number
+  postFee: number
+  payMoney: number
 }
