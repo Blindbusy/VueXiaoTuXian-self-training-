@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 
+const props = defineProps<{
+  type: number
+}>()
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 // tabs 数据
@@ -13,6 +17,12 @@ const orderTabs = ref([
 ])
 
 const activeIndex = ref(0)
+
+onLoad(() => {
+  if (props.type) {
+    activeIndex.value = props.type
+  }
+})
 </script>
 
 <template>
