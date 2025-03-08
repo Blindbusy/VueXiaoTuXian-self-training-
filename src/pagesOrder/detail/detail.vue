@@ -2,6 +2,7 @@
 import { useGuessList } from '@/composables'
 import { OrderState } from '@/services/constans'
 import {
+  deleteMemberOrderAPI,
   getMemberOrderByIdAPI,
   getMemberOrderConsignmentByIdAPI,
   getMemberOrderLogisticsByIdAPI,
@@ -149,6 +150,19 @@ const onOrderConfirm = () => {
     },
   })
 }
+
+// 删除订单
+const onOrderDelete = () => {
+  uni.showModal({
+    content: '确定要删除订单吗？',
+    success: async (success) => {
+      if (success.confirm) {
+        await deleteMemberOrderAPI({ ids: [query.id] })
+        uni.redirectTo({ url: '/pagesOrder/list/list' })
+      }
+    },
+  })
+}
 </script>
 
 <template>
@@ -186,7 +200,7 @@ const onOrderConfirm = () => {
         <template v-if="order?.orderState === OrderState.DaiFuKuan">
           <view class="status icon-clock">等待付款</view>
           <view class="tips">
-            <text class="money">应付金额: ¥ 99.00</text>
+            <text class="money">应付金额: ¥ {{ order.payMoney }}</text>
             <text class="time">支付剩余</text>
             <uni-countdown
               :second="order.countdown"
@@ -255,29 +269,29 @@ const onOrderConfirm = () => {
         <view class="item">
           <navigator
             class="navigator"
-            v-for="item in 2"
-            :key="item"
-            :url="`/pages/goods/goods?id=${item}`"
+            v-for="item in order.skus"
+            :key="item.id"
+            :url="`/pages/goods/goods?id=${item.skuId}`"
             hover-class="none"
           >
-            <image
-              class="cover"
-              src="https://yanxuan-item.nosdn.127.net/c07edde1047fa1bd0b795bed136c2bb2.jpg"
-            ></image>
+            <image class="cover" :src="item.image"></image>
             <view class="meta">
-              <view class="name ellipsis">ins风小碎花泡泡袖衬110-160cm</view>
-              <view class="type">藏青小花， 130</view>
+              <view class="name ellipsis">{{ item.name }}</view>
+              <view class="type">{{ item.attrsText }}</view>
               <view class="price">
                 <view class="actual">
                   <text class="symbol">¥</text>
-                  <text>99.00</text>
+                  <text>{{ item.curPrice }}</text>
                 </view>
               </view>
-              <view class="quantity">x1</view>
+              <view class="quantity">{{ item.quantity }}</view>
             </view>
           </navigator>
           <!-- 待评价状态:展示按钮 -->
-          <view class="action" v-if="true">
+          <view
+            class="action"
+            v-if="order.orderState === OrderState.DaiPingJia"
+          >
             <view class="button primary">申请售后</view>
             <navigator url="" class="button"> 去评价 </navigator>
           </view>
@@ -286,15 +300,15 @@ const onOrderConfirm = () => {
         <view class="total">
           <view class="row">
             <view class="text">商品总价: </view>
-            <view class="symbol">99.00</view>
+            <view class="symbol">{{ order.totalMoney }}</view>
           </view>
           <view class="row">
             <view class="text">运费: </view>
-            <view class="symbol">10.00</view>
+            <view class="symbol">{{ order.postFee }}</view>
           </view>
           <view class="row">
             <view class="text">应付金额: </view>
-            <view class="symbol primary">109.00</view>
+            <view class="symbol primary">{{ order.payMoney }}</view>
           </view>
         </view>
       </view>
@@ -307,7 +321,7 @@ const onOrderConfirm = () => {
             订单编号: {{ query.id }}
             <text class="copy" @tap="onCopy(query.id)">复制</text>
           </view>
-          <view class="item">下单时间: 2023-04-14 13:14:20</view>
+          <view class="item">下单时间: {{ order.createTime }}</view>
         </view>
       </view>
 
@@ -324,8 +338,8 @@ const onOrderConfirm = () => {
         :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }"
       >
         <!-- 待付款状态:展示支付按钮 -->
-        <template v-if="true">
-          <view class="button primary"> 去支付 </view>
+        <template v-if="order.orderState === OrderState.DaiFuKuan">
+          <view class="button primary" @tap="onOrderPay"> 去支付 </view>
           <view class="button" @tap="popup?.open?.()"> 取消订单 </view>
         </template>
         <!-- 其他订单状态:按需展示按钮 -->
@@ -338,11 +352,27 @@ const onOrderConfirm = () => {
             再次购买
           </navigator>
           <!-- 待收货状态: 展示确认收货 -->
-          <view class="button primary"> 确认收货 </view>
+          <view
+            class="button primary"
+            v-if="order.orderState === OrderState.DaiShouHuo"
+          >
+            确认收货
+          </view>
           <!-- 待评价状态: 展示去评价 -->
-          <view class="button"> 去评价 </view>
+          <view
+            class="button"
+            v-if="order.orderState === OrderState.DaiPingJia"
+          >
+            去评价
+          </view>
           <!-- 待评价/已完成/已取消 状态: 展示删除订单 -->
-          <view class="button delete"> 删除订单 </view>
+          <view
+            class="button delete"
+            v-if="order.orderState >= OrderState.DaiPingJia"
+            @tap="onOrderDelete"
+          >
+            删除订单
+          </view>
         </template>
       </view>
     </template>

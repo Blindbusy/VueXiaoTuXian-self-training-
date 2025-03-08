@@ -1,5 +1,6 @@
 import type {
   OrderCreateParams,
+  OrderLogisticResult,
   OrderPreResult,
   OrderResult,
 } from '@/types/order'
@@ -80,29 +81,15 @@ export const getMemberOrderLogisticsByIdAPI = (id: string) => {
   })
 }
 
-/** 物流信息 返回值类型 */
-export type OrderLogisticResult = {
-  /** 快递公司 */
-  company: {
-    /** 公司名称 */
-    name: string
-    /** 快递编号 */
-    number: string
-    /** 联系电话 */
-    tel: string
-  }
-  /** 商品件数 */
-  count: number
-  /** 物流日志 */
-  list: LogisticItem[]
-}
-
-/** 物流日志 */
-export type LogisticItem = {
-  /** 信息ID */
-  id: string
-  /** 信息文字 */
-  text: string
-  /** 时间 */
-  time: string
+/**
+ * 删除订单
+ * @description 仅在订单状态为待评价，已完成，已取消时，可删除订单。
+ * @param data ids 订单集合
+ */
+export const deleteMemberOrderAPI = (data: { ids: string[] }) => {
+  return http({
+    method: 'DELETE',
+    url: `/member/order`,
+    data,
+  })
 }
